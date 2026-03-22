@@ -84,25 +84,22 @@ async def run_code_review(pr: PullRequest, diff: str, files: list[dict]) -> str:
 
     result_text = ""
 
-    try:
-        async for message in query(
-            prompt=prompt,
-            options=ClaudeAgentOptions(
-                system_prompt=SYSTEM_PROMPT,
-                # Code Review 只需要"思考"，不需要文件操作工具
-                allowed_tools=[],
-                # 关闭交互式权限提示，纯批处理模式
-                permission_mode="bypassPermissions",
-                # 限制最大轮次，防止 Agent 死循环
-                max_turns=5,
-            ),
-        ):
-            if isinstance(message, ResultMessage):
-                result_text = message.result
-                break
-    except Exception:
-        # claude-agent-sdk 在 break 后清理 anyio cancel scope 时会抛出无害异常，忽略即可
-        pass
+    # 注意：不要用 break 提前退出，否则会触发 anyio cancel scope 异常
+    # 让循环自然走完，ResultMessage 通常是最后一条消息
+    async for message in query(
+        prompt=prompt,
+        options=ClaudeAgentOptions(
+            system_prompt=SYSTEM_PROMPT,
+            # Code Review 只需要"思考"，不需要文件操作工具
+            allowed_tools=[],
+            # 关闭交互式权限提示，纯批处理模式
+            permission_mode="bypassPermissions",
+            # 限制最大轮次，防止 Agent 死循环
+            max_turns=5,
+        ),
+    ):
+        if isinstance(message, ResultMessage):
+            result_text = message.result
 
     if not result_text:
         result_text = "⚠️ Code Review Agent 未返回结果，请手动检查。"
