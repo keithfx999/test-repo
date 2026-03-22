@@ -11,19 +11,11 @@ permissions:
 
 jobs:
   code-review:
-    runs-on: self-hosted        # 使用服务器上的 Self-hosted Runner
+    runs-on: self-hosted
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        working-directory: pr-review-agent
-        run: python3 -m pip install -r requirements.txt -q
-
       - name: Run Code Review
-        working-directory: pr-review-agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -33,4 +25,4 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_HTML_URL: ${{ github.event.pull_request.html_url }}
-        run: python3 run_review.py
+        run: python3 /data/workspace/github-bot/pr-review-agent/run_review.py
