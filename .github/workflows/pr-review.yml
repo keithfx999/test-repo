@@ -13,14 +13,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
       - name: Install dependencies
         working-directory: pr-review-agent
-        run: pip install -r requirements.txt
+        run: python3 -m pip install -r requirements.txt -q
 
       - name: Run Code Review
         working-directory: pr-review-agent
@@ -33,4 +28,4 @@ jobs:
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_HTML_URL: ${{ github.event.pull_request.html_url }}
-        run: python run_review.py
+        run: python3 run_review.py
