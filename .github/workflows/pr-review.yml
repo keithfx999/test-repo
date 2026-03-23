@@ -5,9 +5,9 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  issues: write          # 发布 PR Comment
-  pull-requests: write   # 发布 PR Review
-  contents: read         # checkout 代码
+  issues: write
+  pull-requests: write
+  contents: read
 
 jobs:
   code-review:
